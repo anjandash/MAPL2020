@@ -1,0 +1,664 @@
+%% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
+\documentclass[sigplan,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+
+\usepackage{xspace}
+\usepackage{color}
+
+%% Conference information
+%% Supplied to authors by publisher for camera-ready submission;
+%% use defaults for review submission.
+\acmConference[PL'18]{ACM SIGPLAN Conference on Programming Languages}{January 01--03, 2018}{New York, NY, USA}
+\acmYear{2018}
+\acmISBN{} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
+\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission;
+%% use 'none' for review submission.
+\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2018}           %% If different from \acmYear
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+%\citestyle{acmauthoryear}  %% For author/year citations
+%\citestyle{acmnumeric}     %% For numeric citations
+%\setcitestyle{nosort}      %% With 'acmnumeric', to disable automatic
+                            %% sorting of references within a single citation;
+                            %% e.g., \cite{Smith99,Carpenter05,Baker12}
+                            %% rendered as [14,5,2] rather than [2,5,14].
+%\setcitesyle{nocompress}   %% With 'acmnumeric', to disable automatic
+                            %% compression of sequential references within a
+                            %% single citation;
+                            %% e.g., \cite{Baker12,Baker14,Baker16}
+                            %% rendered as [2,3,4] rather than [2-4].
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Note: Authors migrating a paper from traditional SIGPLAN
+%% proceedings format to PACMPL format must update the
+%% '\documentclass' and topmatter commands above; see
+%% 'acmart-pacmpl-template.tex'.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+\usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand{\R}{\mathbb{R}}
+\newcommand*{\field}[1]{\mathbb{#1}}
+
+\begin{document}
+
+\newcommand{\benchmarkName}{\textsc{glue}Code\xspace}
+\newcommand{\minibenchmarkName}{\benchmarkName mini \xspace}
+
+\newcommand{\etal}{\emph{et al.}\xspace}
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+% We could also say "Towards a benchmark for source code models"
+\title[\benchmarkName mini]{\benchmarkName mini: A benchmark for source code machine learning models}         %% [Short Title] is optional;
+                                        %% when present, will be used in
+                                        %% header instead of Full Title.
+% \titlenote{with title note}             %% \titlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+% \subtitle{Subtitle}                     %% \subtitle is optional
+% \subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+%% Author with single affiliation.
+\author{First1 Last1}
+\authornote{with author1 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{nnnn-nnnn-nnnn-nnnn}             %% \orcid is optional
+\affiliation{
+  \position{Position1}
+  \department{Department1}              %% \department is recommended
+  \institution{Institution1}            %% \institution is required
+  \streetaddress{Street1 Address1}
+  \city{City1}
+  \state{State1}
+  \postcode{Post-Code1}
+  \country{Country1}                    %% \country is recommended
+}
+\email{first1.last1@inst1.edu}          %% \email is recommended
+
+%% Author with two affiliations and emails.
+\author{First2 Last2}
+\authornote{with author2 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{nnnn-nnnn-nnnn-nnnn}             %% \orcid is optional
+\affiliation{
+  \position{Position2a}
+  \department{Department2a}             %% \department is recommended
+  \institution{Institution2a}           %% \institution is required
+  \streetaddress{Street2a Address2a}
+  \city{City2a}
+  \state{State2a}
+  \postcode{Post-Code2a}
+  \country{Country2a}                   %% \country is recommended
+}
+\email{first2.last2@inst2a.com}         %% \email is recommended
+\affiliation{
+  \position{Position2b}
+  \department{Department2b}             %% \department is recommended
+  \institution{Institution2b}           %% \institution is required
+  \streetaddress{Street3b Address2b}
+  \city{City2b}
+  \state{State2b}
+  \postcode{Post-Code2b}
+  \country{Country2b}                   %% \country is recommended
+}
+\email{first2.last2@inst2b.org}         %% \email is recommended
+
+
+%% Abstract
+%% Note: \begin{abstract}...\end{abstract} environment must come
+%% before \maketitle command
+\begin{abstract}
+A multitude of machine learning models of code have been proposed the last few years. These models are commonly trained to perform well on a single task, but do not necessarily generalize to other downstream tasks. A \textit{general} source code model for learning-based tasks is a desirable goal to strive towards. Therefore, to properly model source code, it serves researchers if they consider information-sharing while building their models so that their models are powerful and robust across multiple tasks. We present a benchmark of tasks as a work-in-progress to evaluate source code models across tasks, diverse in nature and difficulty. This benchmark of tasks would enable researchers evaluate their models based on their modeling power and generalizability, and drive them towards building more robust source code models.\end{abstract}
+
+
+
+%% 2012 ACM Computing Classification System (CSS) concepts
+%% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10002944.10011123.10011131</concept_id>
+       <concept_desc>General and reference~Experimentation</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10002944.10011123.10011130</concept_id>
+       <concept_desc>General and reference~Evaluation</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10002944.10011123.10011124</concept_id>
+       <concept_desc>General and reference~Metrics</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011006</concept_id>
+       <concept_desc>Software and its engineering~Software notations and tools</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010147.10010257.10010293</concept_id>
+       <concept_desc>Computing methodologies~Machine learning approaches</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[300]{General and reference~Experimentation}
+\ccsdesc[300]{General and reference~Evaluation}
+\ccsdesc[300]{General and reference~Metrics}
+\ccsdesc[500]{Software and its engineering~Software notations and tools}
+\ccsdesc[500]{Computing methodologies~Machine learning approaches}
+%% End of generated code
+
+
+%% Keywords
+%% comma separated list
+\keywords{benchmark, programming language understanding, programming language processing, deep learning}  %% \keywords are mandatory in final camera-ready submission
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+\section{Introduction}
+% Anjan, I'm commenting out your sentences so that you can compare how it was versus how I am rephrasing them.
+% One high level thing I will do is to separate the two points you are making:
+% - the need for a benchmark in general to compare many models
+% - the ultimate goal of a unified model that works well on all tasks
+
+%The availability of large amounts of reliable data in the form of source code, and advances in the field of deep learning, has made it possible for us to address various problem-tasks related to programming language, software engineering, etc. 
+% And as a result, a great number of studies have been published in the domain of deep learning applications for code. There are a number of source code models, which are utilized to address a variety of problem-tasks such as code-completion, code-summarization, name-generation, defect-prediction, among others.
+% However, naturally, many of the models are task-specific, failing to perform satisfactorily well on downstream tasks. Moreover, they may also differ in the way they indeed model the source code, e.g. different levels of granularity, different embedding techniques. 
+
+% Modeling source code efficiently - in the sense, to gather as much as context information as possible or necessary - calls for the need to represent source code in a format that is best-suited for learning. Currently there are many proposed approaches to model source code [See Section 2] for a varied number of tasks. Some representation approaches may work well on the tasks they were trained for, but perhaps not on downstream tasks [e.g. code2vec]. 
+
+ % Therefore, a desirable long-term goal of this domain of research could be the creation of a unified source code model that performs well across multiple tasks related to source code, not only the tasks it was trained for but also downstream tasks. Our idea is to define a benchmark of challenging tasks, varying in difficulty and nature. The input data points of these tasks will be made available in different representation formats, so that different types of models can be trained. Interested researchers could then design and train their models making use of our benchmark datasets and attempt to create a unified source code model. We shall then compare the accuracy, F1, and other relevant scores of the different models, as well as their training performance, across all the tasks to rank them. In this paper we present a mini version of the benchmark with simple baselines, and basic code representations. For this version of the benchmark, we choose three tasks and two representation types. We also run some simple models on the datasets ourselves to produce the initial baselines to improve upon. 
+
+Recent advances in machine learning along with the availability of large amounts of reliable data in the form of source code, and advances in the field of deep learning, has resulted in extensive progress in open problems in the programming language and software engineering fields, such as code completion, code summarization, identifier name generation, defect prediction, among others. %Add references!
+
+% Here I am expanding on your argument on the variety of modeling choices, to show more concretely how varied it can be
+For these tasks, multiple approaches have been proposed, each of them modeling source code differently; some of them are presented in \autoref{sec:relwork}. This is because the space of modelling choices for source code is extremely large: source code representations range from the simplest (metrics or $n$-grams), to the most complex, that fully take advantage of the structure and semantics of source code (such as graph-based representations). Even seemingly basic choices, such as how to preprocess identifiers, can be handled in many different ways; since software vocabulary can be very large, this basic choice can have a disproportionate impact. % cite the ICSE 2020 paper
+
+% Here I am introducing the idea of a benchmark.
+% Add references to: 
+% - Sim et al ICSE 2003: Using benchmarking to advance research: A challenge to software engineering
+% - Blackburn et al OOPSLA 2006: The DaCapo benchmarks: java benchmarking development and analysis
+% - GLUE, SuperGLUE
+While the many tasks and many possible source code representations make for a vibrant research community, it makes it hard to measure progress of the field as a whole. One way to do so is via benchmarking. Sim~\etal challenged the software engineering research community to adopt benchmarking as an evaluation techniques, based on the impact it has on community building \cite{simbenchmark}. Benchmarks have been used in the performance community, such as DaCapo \cite{decapo}, and several benchmarks have received extensive interest in Natural Language Processing (NLP), such as GLUE and SuperGLUE (\autoref{sec:relwork} details some of these benchmarks). 
+
+% Here I am talking specifically of our benchmark
+We aim to build such a benchmark for source code representations, called \benchmarkName. Here we present our work in progress towards this goal, GLUE Code-mini (\autoref{sec:glucode mini}). Similarly to the GLUE and SuperGLUE NLP benchmarks \citet{DBLP:journals/corr/abs-1804-07461, DBLP:journals/corr/abs-1905-00537}, GLUE Code will provide a set of diverse, challenging tasks, with standard evaluation metrics, so that any given model can be evaluated in a variety of settings. However, \emph{unlike} GLUE and SuperGLUE, GLUE Code also provides \emph{several possible representations of the data}, acknowledging the variety of modelling choices available for code.  In this paper, we present a mini version of the benchmark with simple baselines, and basic code representations. For this version of the benchmark, we choose three tasks and two representation types. We also run some simple models on the datasets ourselves to produce the initial baselines to improve upon (Section 4).  
+ 
+% Here I touch on the unified model part.
+Finally, while models can be evaluated on any single task in the benchmark in isolation (similarly to how the field is presently doing), a desirable long-term goal of \benchmarkName would be the creation of a unified source code models that perform well across multiple tasks related to source code. A source code model that is jointly trained and can perform well on all the task in the benchmark would be a significant step towards more versatile models, that can, beyond the tasks they were trained, also adapt to downstream tasks, especially when there is no sufficient data. Our initial experiments show that there is still a way to go, before this becomes a reality.
+% Should we add a section for this, or just a subsection in the results
+
+We close the paper by discussing our results and possible changes to the benchmark. In particular, we discuss additional source code representations and discuss prospective tasks we are considering to add to our benchmark before we release the full benchmark to the community (Section 5). 
+
+\section{Related Work}
+\label{sec:relwork}
+In this section, we discuss the relevant work in literature linked to problem-tasks, function embeddings or representation types, and benchmarks.
+
+\subsection{Embeddings of Functions}
+In the recent past, programs were generally represented as a bag of tokens, but multiple studies have now shown that leveraging the structured nature of source code help us reason better over code; and the models trained on such representations perform consistently well over sequential or less-structured program representations. Therefore, we only consider the program representations which make use of some form of program structure, whether by extracting information from abstract syntax tress, control-flow or data-flow graphs, or similar structures.
+
+\paragraph*{AST} \citet{DBLP:journals/corr/abs-1710-11054} take the AST of a function and for every node considering pertinent attributes such as the the node type, the string label of the node, the absolute position of the node, and the relationship to its parent, they compute a function embedding. They use this function embedding, for Python code, to address the VarMisuse task [See Section 2.3].
+
+\paragraph*{AST Recursive Aggregation}
+\citet{buch2019learning} use the AST node type and node content to create node representations of a function. They implement a Siamese Network to share weights of two instances of Recursive Neural Networks, that aggregate the ASTs of two given Java methods to get the method embeddings. They make use of the embeddings for the task of clone detection.
+
+\paragraph*{Bag of AST Paths}
+\citet{DBLP:journals/corr/abs-1803-09544, DBLP:journals/corr/abs-1808-01400} leverage the structured nature of source code by considering a bag of paths in the programs abstract syntax tree to generate method embeddings for Java. They use the method embeddings for the task of MethodNaming as code summarization, and code captioning.
+
+\paragraph*{Path-based Embedding of CFGs} \citet{DBLP:journals/corr/abs-1802-07779} utilize inter-procedural control flow graphs to generate function embeddings for code. They consider paths from random walks on the inter-procedural control flow graph of a program to generate the embeddings. They then use the embeddings, for C code, to detect function clones
+
+\paragraph*{Hyperbolic Function Embedding}
+\citet{HyperbolicFuncEMBED} propose a novel hyperbolic function embedding method, which can learn a distributed and hierarchical representation for each function. They model the call-relationships among the functions using a call-graph, and then they make use of the Ricci curvature model to verify the underlying geometry of the call graph, and build their model from that in a hyperbolic space, for every function. They use the hyperbolic function embedding for function classification and link prediction.
+
+\paragraph*{Feature graphs} \citet{DBLP:journals/corr/abs-1711-00740} make use of the combined information from abstract syntax trees, control-flow, data-flow graphs etc. of a program to generate feature graphs, which consider long-range dependencies and the structural nature of source code, to reason over source code. They use graph-based deep learning methods to train their models for the VarNaming~\citep{DBLP:journals/corr/AllamanisBS14} and the VarMisuse tasks.
+
+\subsection{NLP Benchmarks}
+In this part of the section, we present the relevant benchmarks and resources that compare, or evaluate the generalizability of models for various tasks. 
+
+\paragraph*{DecaNLP Benchmark:} To go beyond the paradigm of task-specific NLP models, based on a single metric or dataset, \citet{DBLP:journals/corr/abs-1806-08730} present a set of ten tasks, to evaluate general NLP models. They cast all tasks in the Question-Answering format over a given context, and present their own Multitask Question Answering Network (MQAN) jointly learns all tasks. 
+
+\paragraph*{GLUE Benchmark} To progress towards the generalizability of NLP models, \citet{DBLP:journals/corr/abs-1804-07461} present the GLUE benchmark to evaluate and analyze the performance of NLP models across a diverse range of existing tasks. They further evaluate baselines based on current methods for multi-task and transfer learning and compare them to the performance of training a separate model per task.
+
+\paragraph*{SuperGLUE Benchmark} With the performance of NLP models on the GLUE benchmark having surpassed the level of non-expert
+humans, Wang et al. \cite{DBLP:journals/corr/abs-1905-00537} reinforce their GLUE benchmark by presenting the SuperGLUE benchmark with harder tasks and diverse task formats. 
+
+\paragraph*{bAbI Tasks} Weston et al. \cite{weston2015towards} suggest several NLP tasks in simple question-answering format intended to test dialogue agents on natural language understanding and reasoning by chaining facts, simple induction, deduction etc. These proxy tasks, meant to evaluate the reading comprehension of a system, provide a yardstick for researchers to assess their NLP models for intelligent dialogue agents. 
+
+\paragraph*{NLP-progress} Lastly, in this online resource, Sebastian Ruder \cite{nlpprogress1} reports the current progress in Natural Language Processing, by curating the datasets and state-of-the-art models for the most common NLP tasks. A wide variety of tasks are taken in consideration and the corresponding the state-of-the-art models are reported in the form of a ranked leader board for each task. (http://nlpprogress.com) 
+
+\subsection{Problem Tasks}
+Several studies have worked on tasks related to source code, some of which we present here. The following set of tasks are examples of the problem tasks we could address and solve to a great degree with the aid of modern deep learning techniques. 
+
+\paragraph*{MethodNaming} A machine learning model of source code aims to predict the name of a certain method, given its code body. This problem task was explored by \citet{allamanis2015suggesting} where they presented a model for source code to correctly predict the name of a method given its source code. This task is discussed in greater detail in the next section.
+
+\paragraph*{VarMisuse} This task concerns the misuse of variables in programs. Given the source code, the purpose of the model for this task is to determine whether a certain variable has been misused at its location. \citet{DBLP:journals/corr/abs-1711-00740} addressed this task and showed that their network learned to reason about selecting the correct variable that should be used at a given program location; and as a consequence could also identify a number of bugs in mature open-source projects.
+
+\paragraph*{Clone Detection} This tasks deals with the identification of code clones. With available pairs of code fragments, a source code code should be able to indicate whether the sample pairs are clones. \citet{white2016deep} utilize a deep learning approach for the classic task of code clone detection, both at the file and the method level with promising results.  
+
+\paragraph*{Defect Prediction} To find defects or bugs of any kind, given some source code, is another problem task quite useful and interesting. \citet{pradel2017deep} address the problem of defect prediction by training a deep-learning based model that can distinguish correct from incorrect code. They present a general framework for extracting positive training examples from a code corpus, make simple code transformations to convert them into negative training samples, and then train a model to indicate one or the other.
+
+
+\section{\benchmarkName mini Benchmark}
+\label{sec:glucode mini}
+% Drawing from the need for a general source code model, which can process source code in a way that is not exclusively tailored for a single task or dataset, and can cater to multiple tasks at the same time, 
+In this section, we present the \minibenchmarkName benchmark, consisting of three problem tasks, which can be used to evaluate models trained with different representations of code. Our eventual goal is to create a benchmark, consisting of diverse tasks, with varying difficulty that each test different aspects of learning and reasoning over code. While \minibenchmarkName has a limited number of tasks, our full benchmark will increase the diversity and range of difficulty.
+
+Given the set of tasks, a source code model can be evaluated against every task on the benchmark to obtain individual scores. The model that performs well on all (or most) tasks, and thus, with the higher overall score, will be ranked higher in our evaluation. Furthermore, models that are trained jointly on all tasks may be able to share knowledge between them, and hence improve their overall score.\newline
+
+
+In terms of diversity of learning tasks, there are several aspects to consider: 
+\textbf{Structure vs Identifiers.} we want to have tasks that rely primarily on the structure of source code, while other tasks that rely primarily on the identifiers present in source code, with additional tasks in between. Having tasks that exercise both aspects is important, since source code has been described as bimodal \cite{allamanis2015bimodal}. 
+
+\textit{Scope.} Most tasks defined so far take as unit a piece of code that is the size of a function or method (or more rarely, a file). However, source code is composed of entities that interact with each other, even if they are not in the same file. Thus, having tasks for which more than local reasoning is needed would be desirable.
+
+\textit{Code Representations.} One goal of our benchmark is to ease the experimentation with diverse source code representations. As such, we do \emph{not} mandate the input representation for each task. Instead, each source code entity has a unique identifier, which is associated to a variety of source code representations, which we discuss in section 3.2.
+
+\textit{Outputs.} Tasks can be diverse in terms of their output format, ranging from classification, to sequence prediction tasks such as summarization. There is a tradeoff between having homogeneous tasks, which simplify the implementation of the models (at the expense of diversity), or heterogeneous tasks, which make it easier to consider diverse tasks, but make the implementation of the models more complex. We are still actively discussing this trade-off and are considering external feedback.
+
+\textit{Difficulty.} 
+For our benchmark, we would prefer a range of tasks varying in difficulty, from easy to difficult tasks. Therefore, we choose three tasks accordingly, an easy, a medium, and a hard task. The 3 tasks are: Method Complexity prediction, Null Dereference prediction, and MethodNaming. 
+
+The Method Complexity prediction task is a multi-class classification task based on the cyclomatic complexity of the method code, which depends on how many different execution paths or control flow of the code can execute. Often cyclomatic complexity is strongly correlated with the number of lines of code \cite{cyclvsloc}, and as such if the model learns these correlations, it should be very easy for the model to accurately predict the complexity of a given method. 
+
+The Null Dereference prediction task may be a straightforward binary classification task, but we hypothesize that for the model to accurately predict occurences of null dereference in a method it might need more information than merely obtained from the local context as null values might have been passed down from neighboring code fragments in the call graph. This we consider as slightly more difficult to predict than the Method Complexity task. 
+
+Finally, for the MethodNaming task the model needs to understand the context of the method code to accurately suggest method names that summarize the purpose of the method. And although local information may be enough for this task, we hypothesize that it is more difficult to predict a suitable name for a method when compared to the other tasks we have considered.
+
+\subsection{Tasks}
+For this first version of the benchmark we consider three tasks, but aim to add more tasks as the benchmark matures. We consider three classification tasks, a binary classification task, and the other multi-class classification tasks. 
+
+\subsubsection{Null Dereference Prediction}
+The goal of the model is to correctly predict whether a given method has an occurrence of a \textit{null dereference} in its code, whereby given an input method code it should be able to classify it based on the nullness criteria. This is a simple binary classification task, classifying labels for methods with \textit{null dereference} and methods without. This is a straightforward defect prediction task where determining the nullness would require reasoning on the data and control flow, and even across usually short distances in the call graph. 
+
+To produce labels for training and testing, we use the Infer static analysis tool from Facebook \cite{fbinfer} to generate bug analysis reports for every project in our dataset, based on which we gather the methods with and without \textit{null dereference} occurrences. \newline
+
+\noindent
+\textbf{Output:} \textit{binary classification}
+
+\noindent
+\textbf{Scope:} \textit{global (a neighbourhood of methods in the call graph)}
+
+\noindent
+\textbf{Measures:} \textit{ability to model the control flow, data flow, and call graph, across usually short distances in the call graph.}
+
+\noindent
+\textbf{Label Source:} \textit{Infer}
+
+\subsubsection{Method Complexity Prediction}
+The goal of the model is to correctly predict the complexity of a method, whereby, given an input method code it should be able to classify it based on the training complexity metric, e.g. McCabe complexity, Halstead complexity etc. This is a multi-class classification task, with labels in a range of possibilities i.e. n+2 classes, where n \in \field{N}.  
+
+In our case, we consider the McCabe, or cyclomatic complexity, which can be calculated with respect to functions, modules, methods within a program. This task is interesting for the benchmark as it enable us to evaluate the modeling prowess of the source code models to extract relevant information from structures such as control flow graph. We use Metrix++~\citep{metrixplusplus} to generate the cyclomatic complexity score for every method in our dataset. \newline
+
+\noindent
+\textbf{Output:} \textit{multi-class classification (N complexity “bins”)}
+
+\noindent
+\textbf{Scope:} \textit{local. Uses method structure only.}
+
+\noindent
+\textbf{Measures:} \textit{ability to model a method from its CFG.}
+
+\noindent
+\textbf{Label Source:} \textit{Metrix++}
+
+\subsubsection{Method Naming}
+The goal is to suggest a suitable name for a method given its code. A method naming model should be able to extract the information  within the code into an appropriate name. We consider the name of the method that the developer originally used as the ground truth. This is a “classical task” \cite{allamanis2015suggesting,DBLP:journals/corr/AllamanisPS16}, where there is still some margin for progression. This is a sequence generation task, where the labels are sequences (of characters or larger units of characters), with the possibility of each data point in the dataset being uniquely labelled. \newline 
+
+\noindent
+\textbf{Output:} \textit{a sequence of tokens representing the method name}
+
+\noindent
+\textbf{Scope:} \textit{mostly local. Uses structure and identifiers.}
+
+\noindent
+\textbf{Measures:} \textit{ability to name a method based on source tokens.}
+
+\noindent
+\textbf{Label Source:} \textit{source code}
+
+
+\begin{table}[t]
+\centering
+\begin{tabular}{llll}
+\toprule
+\textit{\textbf{Task}}& \textit{\textbf{Output}} &\textit{\textbf{Scope}}  & \textit{\textbf{Label Source}}   \\ \midrule
+MethodNaming & sequence gen.         & local          & Source code             \\
+Complexity   & multi-class clf.        & local          & Metrix++                \\
+Nulldef      & binary clf.        & global         & Infer                   \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Supported Representation Types}
+Instead of a single representation type, \benchmarkName has multiple representations that provide different ways at looking at the code. For this version of \benchmarkName, we take two different representation types into consideration, but plan to add more representation types in later versions. 
+
+\subsubsection{Method Tokens}
+Just as in NLP applications where usually every word is a token, The most common representation type for source code is tokens. This is a straight-forward representation type where we view source code as a sequence of tokens, $t_0 \dots t_N$.  
+
+\subsubsection{ASTs}
+Natural language and source code (written in a programming "language") may share many similarities, yet one interesting aspect which differentiates source code from natural language is that source code has a known structure \citep{DBLP:journals/corr/MaddisonT14,DBLP:journals/corr/abs-1711-00740,DBLP:journals/corr/abs-1803-09544}. This additional structure can be leveraged to obtain a better understanding of code when building models to predict program properties. Simple token-based models commonly fail to capture the rich relationships among code elements. Instead, source code processing based on a tree-structure such as the Abstract Syntax Tree (AST) makes a much better representation~\citep{DBLP:journals/corr/MaddisonT14}. 
+
+There are a number ways to construct representations of source code from their abstract syntax trees \citep{DBLP:journals/corr/abs-1803-09544,DBLP:journals/corr/abs-1710-11054,HyperbolicFuncEMBED}. For this version of \benchmarkName, we are going to represent our source code input as bags of AST paths, $p_0 \dots p_M$ for each program fragment (e.g. method source code), where each path $p_i$ represents a sequence of nodes in the program fragment's AST \citep{DBLP:journals/corr/abs-1803-09544}.
+
+\subsection{Data Preprocessing}
+
+\subsubsection{Dataset}
+We use the \textbf{50K-C}~\citep{10.1145/3196398.3196450KC} a dataset of compilable, and compiled, Java projects, for our purposes. There are a total of 50,000 projects in the entire dataset, however, we are only considering projects which have 50 or more classes, and excluding smaller projects in general, to model the majority of real-world projects.
+
+We found \textasciitilde5300 projects with 50 classes or more that we could use for our tasks. These projects have a combined total of 371,492 class files, and 2,361,111 method declarations. Considering the method-level granularity, we could potentially have over 2 million data points for training our models. 
+
+\todo{deduplication?}
+\todo{mini dataset}
+For our baseline models, however, we consider a small dataset of \textasciitilde12,000 data points, as justified later on. 
+
+Final Data size, date points > Removal of duplicates > Balancing >
+
+[INSERT A TABLE OF CLASSES PER PROJECT 50-100, 100-500, 500-1000, 1000-1500, 1500+] maybe in the APPENDIX
+
+\subsubsection{Tools used}
+
+To gather the labels for our dataset, we use a number of tools.
+
+We use Infer \cite{fbinfer} to perform static analysis on the projects in order to obtain \textit{null dereference} labels for methods in our dataset. As an auxillary tool, we also make use of the SourcererJBF tool to compile the selected projects locally from the 50K-C dataset, as Infer requires the projects to be locally compilable on execution.. 
+
+For gathering the cyclomatic complexity \cite{1702388cycl} of program fragments, specifically methods in our case, we use Metrix++ \cite{metrixplusplus} which is a tool for code metrics collection and analysis .
+
+
+Code2Vec, preprocessor
+
+\section{Benchmark results}
+
+\subsection{Models used}
+In this section, we outline the simple model architectures we have used to obtain our baselines. \newline
+
+\noindent
+\textbf{Base LSTM model definition:} We declare a Keras model with the Sequential() constructor. We add an embedding layer, of vocabulary size 5000, embedding dimension 64, and input maximum length 200, as our first layer. This converts our words or tokens into meaningful embedding vectors. Then we add our Bidirectional LSTM layer. The standalone LSTM layer is initialized with the value of the embedding dimension, and additionally, we also set \textit{return\textunderscore sequences=True} to ensure that the cells returns all of the outputs from the unrolled LSTM cell through time. The LSTM layer is then wrapped with a Bidirectional layer wrapper. We then add a densely-connected neural network layer on top of that with the number of units equal to the embedding dimension, and use ReLU as our activation function. And yet another, with softmax activation, which is our output layer.
+
+We compile the model with adam \cite{kingma2014adam} optimizer, and choose \textit{sparse categorical crossentropy} as our loss function since we are going to use the same model to multi-class classification.  \newline
+
+\noindent
+\textbf{Base CNN model definition:} Also for our base CNN model, we declare a Keras model with the Sequential() constructor. We add an embedding layer, of vocabulary size 5000, embedding dimension 64, and input maximum length 200, as our first layer. We then add a 1D convolution layer, specifying the dimensionality of the output space 128, the size of 1D convolution window 5, and the activation function which we set to ReLU. We then add a 1D global average pooling layer to reduce the data dimensionality and make our model faster. The last two layers on top of the pooling layer are identical to our LSTM model, we add a densely-connected neural network layer with the number of units equal to the embedding dimension, and use ReLU as our activation function. And we then add another densely-connected neural network layer as our output layer, with softmax activation. 
+
+Even for the CNN model, we choose \textit{sparse categorical crossentropy} as our loss function because we will use the same model for all the tasks, all of which are multi-class classifications. We compile the CNN model with adam \cite{kingma2014adam} optimizer. \newline
+
+
+% \noindent
+% \textbf{Base Glove model: }
+
+\noindent
+\textbf{Code2Vec model: \newline}
+
+\noindent
+\textbf{Code2seq model: \newline} 
+
+\begin{table*}[t]
+\centering
+\caption{Evaluation Results on \minibenchmarkName.}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+Dataset                  & Models   & \multicolumn{4}{N|}{NullDef}  & \multicolumn{4}{N|}{ Complexity } & \multicolumn{4}{N|}{ MethodNaming }  \\ \hline
+\multirow{}{}{ 50K-C \n mini }   & \textit{tok. series}         & PR & RE & F1 & Acc.            & PR & RE & F1 & Acc.              & PR & RE & F1 & Acc.                  \\ \cline{2-14}\cline{2-14}
+                         
+                         & LSTM     & 0.500   & 0.271  & 0.351   & 0.542               & 0.033   & 0.042    & 0.035   & 0.507                    & 0.500   & 0.046    & 0.085   & 0.093                    \\ \cline{2-14}
+                         & CNN      & 0.500   & 0.286    & 0.364   & 0.573               & 0.050   & 0.042   & 0.046   & 0.479                   & 0.500   & 0.052   & 0.095   & 0.105                   \\ \cline{2-14}
+                         & Multi &    &    &    &                &    &    &    &                    &    &    &    &                    \\ \cline{2-14} 
+                         
+                         & \multicolumn{13}{l|}{}                                                                                            \\ \cline{2-14}
+                         & \textit{structured}         & PR & RE & F1 & Acc.            & PR & RE & F1 & Acc.              & PR & RE & F1 & Acc.               \\ \cline{2-14}\cline{2-14}
+                         
+                         & Code2vec & 0.500   & 0.443   & 0.470   & 0.886              & 0.500  & 0.074 & 0.129 & 0.148                  & 0.500   & 0.064   & 0.114   & 0.128                 \\ \cline{2-14}
+                         & Code2seq & 0.500    & 0.370   & 0.425   & 0.741               & 0.500    & 0.048   & 0.088    & 0.096                    & 0.500    & 0.015   & 0.029     & 0.030                \\ \hline
+\end{tabular}
+\end{table*}
+
+\subsection{Baselines}
+
+\subsubsection{Null Dereference Prediction}
+We use a mini dataset of 8112 datapoints, with 4056 \textit{nulldef} labels and 4056 \textit{normal} labels. The datapoints with \textit{nulldef} labels correspond to methods with null dereference occurences, and the ones with \textit{normal} labels correspond to methods without any null dereference occurences. Each label in the dataset is associated with two representations, namely: method tokens from the method source, bag of AST paths extracted from the method source. This enables us to train different source code models with different input representations for the same task. 
+
+Here we choose a small number of datapoints in our dataset to have a balanced representation of the two label types, and for initial comparison with other models that we will evaluate for this task. This helps us train faster, but at the cost of model metrics suffering significantly. When measuring the model metrics we consider the accuracy on the test set, and report the macro-F1, precision and recall. [WHY?]   \newline
+
+\noindent
+\textbf{LSTM: } We used a simple LSTM, trained on source code tokens, as defined in [Section 4.1] for this task, the results of which are detailed in Table 2. For illustration, we are using a small dataset with a little over 8000 data points, and around 4000 learning data points for each label. The accuracy of our LSTM model is 0.543, with a macro-F1 score of 0.351. Our baselines do not represent the state-of-the-art but merely to show how the simple models fare in comparison to the others. Thus, the scores for this task may be further improved, even with our same simple LSTM model, by considering a larger dataset with more training samples, or by tweaking the model with more suitable hyperparameters. \newline
+
+\noindent
+\textbf{CNN: } We applied the simple CNN model defined in [Section 4.2], with source code tokens as its code representation, to address this task. We obtained an accuracy of 0.573, slightly better than the simple LSTM model and a macro-F1 score of 0.364, which is again an improvement on the LSTM model. However, since we use just a single 1D convolution layer, training for just 10 epochs, the performance is quite basic, and considering the small dataset that we used, we can expect a increase in performance for this simple model with more datapoints to learn from. Nevertheless, for the same dataset, the simple CNN model performs slightly better than our basic LSTM model for this task at least. \newline 
+
+\noindent
+\textbf{code2vec: } We make use of code2vec to learn structured representations of code in the form of AST paths \cite{code2vec}, to obtain an accuracy of 0.886 and a macro-F1 score of 0.470. We trained the model for 10 epochs, the same as all the models we've used for this task for a fair comparison. From the predictions produced by the code2vec model, we only consider the predicted label at first rank, since it is a binary classification problem. The performance of the code2vec model is significantly better in terms of accuracy as compared to the previous models for this task, but the overall predictive power, based on the precision and recall scores, is still not decent. Again, it is apparent that we may improve the predictive power of this  model by considering from datapoints for learning, and by choosing its hyperparameters suitably. \newline
+
+\noindent
+\textbf{code2seq: } How they performed and why? Observations.
+
+\subsubsection{Complexity Prediction}
+For the complexity prediction task, we considered a mini dataset of 13000 datapoints, with 1000 labels each for every complexity label from 0 to 13, i.e. methods with a complexity score of 0 has 1000 datapoints in the dataset, methods with a complexity score of 1 has 1000 datapoints in the dataset and so on. Again, all labels in the dataset are associated with two representations, method tokens from the method source and bag of AST paths extracted from the method source. This allows us to train different source code models with different input representations for this task. \newline
+
+\noindent
+\textbf{LSTM: } We used the same LSTM model defined in [Section 4.1] for complexity prediction as well. The model results are shown in Table 2. The LSTM model trained on source code tokens and was able to obtain an accuracy score of 0.507 and a macro-F1 score of 0.035. Even though though the accuracy is high, the precision and recall measures show that the model has done much more poorly than presumed at first glance. In such a case, the model might learn to predict a particular simple class (e.g. complexity score 0) and produce some true positives for that label and a high number of true negatives for the rest, and subsequently higher number of false positives and false negatives. Counting the true negatives it may give a high accuracy but overall the model still fails to predict labels well. Although this model is very simple, yet gathering from the results obtained, we can infer that predicting the complexity is a hard task to tackle especially when relying on source code tokens vector representations. Needless to say, improvements in the model hyperparameters and training on more input data points could improve the simple LSTM for this task. \newline
+
+\noindent
+\textbf{CNN: } We applied our simple CNN model, as defined in [Section 4.2], to predict the cyclomatic complexity based on method source code tokens. The model, again, performed poorly with an accuracy of 0.479 and macro-F1 score of 0.038, as shown in Table 2. The precision and recall scores of this multi-class classification show the inadequacy of the model to extract information from source code tokens for this task, even though it had earlier performed comparatively much better for the null dereference binary classification task. Again, the model might have a small number of true positives and then a high number of true negatives, false positives and negatives. However, considering the fact that we only trained the models for 10 epochs and on a small dataset of \textasciitilde8000 datapoints, we could expect a slight improvement in model performance if we were to take care of these factors. \newline
+
+\noindent
+\textbf{code2vec: } We harnessed some of the structure-based learning by means of code2vec modelling to tackle the complexity prediction task, the results of which can be found on Table 2. For this task, the model obtained an accuracy score of 0.148 and a macro-F1 score of 0.129. Even though the precision and recall measures are better than token-based models, the overall performance is still quite poor. We deliberately choose just the first predicted labels, from the list of ten valid predictions for every datapoint for obvious reasons. Since all the models evaluated for this task are run for just 10 epochs, we also run our code2vec model for the same number of epochs on the same dataset with the same labels, but different representation type i.e. bag of AST paths. Consistent poor performance on the complexity prediction task may indicate that it is a hard task, even though we have not utilized the full predictive power of the model. \newline 
+
+\noindent
+\textbf{code2seq: } How they performed and why? Observations. 
+
+\subsubsection{MethodNaming}
+We use a mini dataset of 8112 datapoints, with method name label for every method datapoint. This task demands efficient feature extraction to summarize source code representations into suitable method names, than merely one-vs-all classification. To diversify the range of tasks and their difficulty the methodNaming task will evaluate the source code models in terms of their modeling power. Therefore, using the same models we note the results for the MethodNaming task and discuss our observations.   \newline
+
+\noindent
+\textbf{LSTM: } For the MethodNaming task we again made use of our LSTM model as defined in [Section 4.1]. Since our model is basically a classifier, it is not a surprise that the model fared so poorly at the task. The accuracy of the model is 0.093 which is less than 1\%, while the macro-F1 score is 0.085. To be able to accurately predict the name of the method, a model needs to understand the semantics and reason from the context. Therefore, predicting suitable method names simply based on code token vectors, without relying on any form of structure might be a tough ask. \newline
+
+
+\noindent
+\textbf{CNN: } Compared to the LSTM model, the CNN obtains a slight improvement in terms of accuracy, and macro-F1 score. Nevertheless, the overall performance is  for the CNN model is not appealing altogether. It's accuracy is 0.105, while the F1 score is 0.095.  \newline
+
+\noindent
+\textbf{code2vec: } The code2vec model reports an accuracy of 0.128, and macro-F1 score of 0.114, which improves upon the token-based models. Although, we'd expect code2vec to perform very well in method naming tasks, we determine that given the size of dataset with \textasciitilde8000 datapoints and 10 epoch runs, we cannot expect more from the model. \newline
+
+\noindent
+\textbf{code2seq: } How they performed and why? Observations. 
+
+% \subsection{Architecture}
+% We are using Keras with tensorflow for our models. 
+
+
+% \textit{Models used:}
+% LSTM: [WHAT ARE THE SETTINGS, HOW MUCH TIME DID IT TAKE, WHAT DATASET DID YOU USE]
+% CNN: [WHAT ARE THE SETTINGS, HOW MUCH TIME DID IT TAKE, WHAT DATASET DID YOU USE]
+% Word2Vec & SVM: [WHAT ARE THE SETTINGS, HOW MUCH TIME DID IT TAKE, WHAT DATASET DID YOU USE]
+% GLOVE & SVM: [WHAT ARE THE SETTINGS, HOW MUCH TIME DID IT TAKE, WHAT DATASET DID YOU USE]
+
+
+
+\subsection{Results}
+
+\subsubsection{Analysis/Discussion based on Observations}
+ 
+ 
+For MethodNaming: For training and evaluation purposes, a solution is marked as correct that simply matches the ground truth label, yet in practice, several possible method names could be considered correct.
+
+different size of datasets
+unseen datasets
+
+
+\section{Prospective Tasks}
+In this section, we present a number of tasks which can be added to our benchmark of tasks, to properly evaluate source code models and their generalizability. The tasks in our consideration are: Liveness prediction, Operator prediction, VarNaming, Clone detetection, and Cost prediction. We propose to include these tasks because of their ability to evaluate proper modeling of source code, their variety, and their usefulness. 
+
+\subsection{Liveness Prediction}
+Every statement has a set number of live variables. Likewise, every method with its combined body of statements, has a number of live variables - by summing of live variables in individual statements. In the same way, every method will have a set number of dead variables as well. The combined number of live and dead variables in a code fragment averaged over the number of lines of code will give us a liveness score. The goal of our model is to correctly predict the liveness score of a method. 
+
+The Liveness prediction task measures the average liveness score of a method in terms of the live and dead variables in use, and the periodicity of memory allocation-deallocation. For a model to learn this information from the input it must make use of a structural basis such as the data-flow of the method. Thus, this task is very useful to model data-flow based features of the method. \newline 
+
+\noindent
+\textbf{Output:} \textit{multi-class classification}
+
+\noindent
+\textbf{Scope:} \textit{local, uses local data-flow analysis}
+
+\noindent
+\textbf{Measures:} \textit{ability to learn from method data-flow analysis}
+
+\noindent
+\textbf{Label Source:} \textit{SOOT Static Analysis Tool}
+
+\subsection{Operator Prediction}
+This task involves accurately predicting operators between variable and literals in a given code fragment. To perform this task well, the model needs to reason from the structure, semantics, and even identify the purpose of program elements and understand how they relate among themselves to accurately predict the right operators. Thus, given a single method with blanked-out slots at the operator locations, the task is to predict the operator that should be used at that location. This is a sequence generation task for operators. 
+
+The operator prediction task is another interesting task where the model should be able to reason about the correct operator type to be used. To be able to accurately predict this, the model needs to understand a lot of aspects combined together, such as the name of the method, the types of the indentifiers/literals in use, and the data flow and control flow information. We hypothesize that this is a difficult task for the model and therefore, this task is a good addition to our benchmark, as it allows us to evaluate even the modeling power of a source code model along with its generalizability. \newline
+
+\noindent
+\textbf{Output:} \textit{sequence generation}
+
+\noindent
+\textbf{Scope:} \textit{local}
+
+\noindent
+\textbf{Measures:} \textit{ability to model structure semantics}
+
+\noindent
+\textbf{Label Source:} \textit{source code}
+
+\subsection{VarNaming}
+This tasks deals with suggesting suitable variable names in a code fragment. The model must learn to generate variable-name sequences for blanked-out slots in the method source by reasoning over the information extracted from the input. 
+
+The VarNaming task is very practical and to be able to build a source code model that could suggest accurate and fairly suitable variable names would be desirable. Having this task in our benchmark would balance the need for generalizability and power, with pragmatic usefulness. \newline
+
+\noindent
+\textbf{Output:} \textit{sequence generation}
+
+\noindent
+\textbf{Scope:} \textit{local}
+
+\noindent
+\textbf{Measures:} \textit{ability to model structure and semantics}
+
+\noindent
+\textbf{Label Source:} \textit{source code}
+
+
+
+\subsection{Clone Detection}
+The goal of the model for this task is to correctly predict whether a given pair of methods are clones, and if so, whether it is a type I, II, III, or IV clone. This is a multi-label classification task as the model has to first classify whether the input pairs are clones, and then classify their clone type. To do well in this task, the model must learn to extract and link patterns at the lexical level along with patterns at the syntactic level, modeling both structure and identifiers. 
+
+For clone detection task we would prefer that the model learns enough about the structural representation of the method and places its attention there, yet is also able to distinguish common identifier patterns in use for such structure, and properly judge their actual semantic value and contribution to the whole model. \newline
+
+\noindent
+\textbf{Output:} \textit{multi-label classification}
+
+\noindent
+\textbf{Scope:} \textit{local, & global?}
+
+\noindent
+\textbf{Measures:} \textit{ability to find similarities on structure/identifiers}
+
+\noindent
+\textbf{Label Source:} \textit{NiCad Clone Detector}
+
+\subsection{Cost Prediction}
+Predicting the runtime cost of a method (including all it's callees) is a task that requires understanding and modeling the code in way that it learns the necessary features correlated with computational load that a given code fragment will impose on the system. The model would have to not only understand the structure of the code, but also operational nuances of code statements and calls to other methods in terms of runtime, to correctly predict the cost of a method. 
+
+The cost prediciton task deals with the runtime cost of a given code fragment and thus it may not be directly evident from the code representations. However, for a model to detect relevant patterns in code and learn on such a task, it needs to extract information beyond the local scale. To ensure the robustness and the generalizability of the source code models we consider this task useful for our benchmark. \newline
+
+\noindent
+\textbf{Output:} \textit{multi-class classification}
+
+\noindent
+\textbf{Scope:} \textit{global, needs information from callees}
+
+\noindent
+\textbf{Measures:} \textit{ability to reason from control flow, call graph, statement semantics}
+
+\noindent
+\textbf{Label Source:} \textit{Infer}
+
+
+
+
+
+\section{Conclusion}
+
+% \begin{table}[]
+% \centering
+% \begin{tabular}{|l|c|l|l|}
+% \hline
+%          & NullDef                      & MethNaming                  & Complexity                  \\ \hline
+% LSTM dmb    & \multicolumn{1}{c|}{0.8522}  & \multicolumn{1}{c|}{0.1465} & \multicolumn{1}{c|}{0.8229} \\ \hline
+% CNN dmb     & \multicolumn{1}{c|}{0.8550}  & \multicolumn{1}{c|}{0.0775} & \multicolumn{1}{c|}{0.8748} \\ \hline
+% Word2Vec &                              &                             &                             \\ \hline
+% GLOVE    &                              &                             &                             \\ \hline
+% \end{tabular}
+% \end{table}
+% Table 1. Initial baselines for the tasks 
+
+
+
+%% Acknowledgments
+\begin{acks}                            %% acks environment is optional
+                                        %% contents suppressed with 'anonymous'
+  %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+  %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+  %% acknowledge financial support and will be used by metadata
+  %% extraction tools.
+  This material is based upon work supported by the 
+  \grantsponsor{GS100000001}{National Science
+    Foundation}{http://dx.doi.org/10.13039/100000001} under Grant
+  No.~\grantnum{GS100000001}{nnnnnnn} and Grant
+  No.~\grantnum{GS100000001}{mmmmmmm}.  Any opinions, findings, and
+  conclusions or recommendations expressed in this material are those
+  of the author and do not necessarily reflect the views of the
+  National Science Foundation.
+\end{acks}
+
+\newpage 
+
+%% Bibliography
+%\bibliography{bibfile}
+\bibliographystyle{plain}
+\bibliography{bibliography.bib}
+
+% %% Appendix
+% \appendix
+% \section{Appendix}
+
+% Text of appendix \ldots
+
+\end{document}
